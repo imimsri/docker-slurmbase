@@ -77,4 +77,18 @@ RUN export CONTAINERPILOT_CHECKSUM=e886899467ced6d7c76027d58c7f7554c2fb2bcc \
 # configuration files and bootstrap scripts
 ENV CONSUL_SNAPSHOT_FREQUENCY 1m
 
+# Add singularity
+RUN apt-get update
+RUN apt-get -y install build-essential curl git sudo man vim autoconf libtool default-jdk
+RUN apt-get -y install python
+RUN git clone https://github.com/singularityware/singularity.git
+RUN cd singularity && ./autogen.sh && ./configure --prefix=/usr/local && make && make install
+
+# Add nextflow
+RUN cd /usr/local/bin && curl -fsSL get.nextflow.io | bash
+RUN chmod +rw /usr/local/bin/nextflow
+
+ADD consul-template /usr/local/bin/consul-template
+RUN chmod +x /usr/local/bin/consul-template
+
 EXPOSE 22
