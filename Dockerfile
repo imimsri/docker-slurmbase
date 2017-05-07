@@ -1,8 +1,9 @@
 FROM ubuntu:16.04
-MAINTAINER Ole Weidner <ole.weidner@ed.ac.uk>
+MAINTAINER jmcarbo <jmcarbo@gmail.com>
 
-#ENV SLURM_VER=16.05.10-2
-ENV SLURM_VER=17.02.2
+ENV SLURM_VER=16.05.10-2
+#ENV SLURM_VER=17.02.2
+
 
 # Create users, set up SSH keys (for MPI)
 RUN useradd -u 2001 -d /home/slurm slurm
@@ -21,15 +22,20 @@ RUN apt-get install -y munge curl gcc make bzip2 supervisor python python-dev \
     libmunge-dev libmunge2 lua5.3 lua5.3-dev libopenmpi-dev openmpi-bin \
     gfortran vim python-mpi4py python-numpy python-psutil sudo psmisc \
     software-properties-common python-software-properties iputils-ping \
-    openssh-server openssh-client tzdata
+    openssh-server openssh-client 
+#libcr-dev blcr-testsuite blcr-util libcr0
 
+RUN apt-get install -y tzdata
+ENV TZ=Europe/Madrid 
+RUN echo $TZ | tee /etc/timezone 
+RUN dpkg-reconfigure --frontend noninteractive tzdata
 
 # Download, compile and install SLURM
-RUN curl -fsL http://www.schedmd.com/downloads/latest/slurm-${SLURM_VER}.tar.bz2 | tar xfj - -C /opt/ && \
-    cd /opt/slurm-${SLURM_VER}/ && \
-    ./configure && make && make install
-ADD etc/slurm/slurm.conf /usr/local/etc/slurm.conf
-
+#RUN curl -fsL http://www.schedmd.com/downloads/latest/slurm-${SLURM_VER}.tar.bz2 | tar xfj - -C /opt/ && \
+#    cd /opt/slurm-${SLURM_VER}/ && \
+#    ./configure && make && make install
+#ADD etc/slurm/slurm.conf /usr/local/etc/slurm.conf
+RUN apt-get install -y slurm-wlm
 
 # Configure OpenSSH
 # Also see: https://docs.docker.com/engine/examples/running_ssh_service/
@@ -64,7 +70,7 @@ ADD etc/supervisord.d/munged.conf /etc/supervisor/conf.d/munged.conf
 # Add Containerpilot and set its configuration
 ENV CONTAINERPILOT_VERSION 2.7.2
 ENV CONTAINERPILOT file:///etc/containerpilot.json
-
+#
 RUN export CONTAINERPILOT_CHECKSUM=e886899467ced6d7c76027d58c7f7554c2fb2bcc \
     && export archive=containerpilot-${CONTAINERPILOT_VERSION}.tar.gz \
     && curl -Lso /tmp/${archive} \
@@ -75,7 +81,7 @@ RUN export CONTAINERPILOT_CHECKSUM=e886899467ced6d7c76027d58c7f7554c2fb2bcc \
     && curl -sL https://github.com/sequenceiq/docker-alpine-dig/releases/download/v9.10.2/dig.tgz|tar -xzv -C /usr/local/bin/
 
 # configuration files and bootstrap scripts
-ENV CONSUL_SNAPSHOT_FREQUENCY 1m
+#ENV CONSUL_SNAPSHOT_FREQUENCY 1m
 
 # Add singularity
 RUN apt-get update
@@ -83,7 +89,7 @@ RUN apt-get -y install build-essential curl git sudo man vim autoconf libtool de
 RUN apt-get -y install python
 RUN git clone https://github.com/singularityware/singularity.git
 RUN cd singularity && ./autogen.sh && ./configure --prefix=/usr/local && make && make install
-
+#
 # Add nextflow
 RUN cd /usr/local/bin && curl -fsSL get.nextflow.io | bash
 RUN chmod +rw /usr/local/bin/nextflow
