@@ -1,4 +1,4 @@
-FROM ubuntu:16.04
+FROM ubuntu:17.04
 MAINTAINER jmcarbo <jmcarbo@gmail.com>
 
 ENV SLURM_VER=16.05.10-2
@@ -35,7 +35,8 @@ RUN dpkg-reconfigure --frontend noninteractive tzdata
 #    cd /opt/slurm-${SLURM_VER}/ && \
 #    ./configure && make && make install
 #ADD etc/slurm/slurm.conf /usr/local/etc/slurm.conf
-RUN apt-get install -y slurm-wlm
+#RUN apt-get install -y slurm-wlm
+RUN apt-get install -y slurm-llnl
 
 # Configure OpenSSH
 # Also see: https://docs.docker.com/engine/examples/running_ssh_service/
