@@ -1,8 +1,7 @@
 FROM ubuntu:17.04
 MAINTAINER jmcarbo <jmcarbo@gmail.com>
 
-ENV SLURM_VER=16.05.10-2
-#ENV SLURM_VER=17.02.2
+ENV SLURM_VER=16.05.11
 
 
 # Create users, set up SSH keys (for MPI)
@@ -36,7 +35,10 @@ RUN dpkg-reconfigure --frontend noninteractive tzdata
 #    ./configure && make && make install
 #ADD etc/slurm/slurm.conf /usr/local/etc/slurm.conf
 #RUN apt-get install -y slurm-wlm
-RUN apt-get install -y slurm-llnl
+#RUN apt-get install -y slurm-llnl
+RUN curl -fsL https://download.schedmd.com/slurm/slurm-${SLURM_VER}.tar.bz2 | tar xfj - -C /opt/ && \
+    cd /opt/slurm-${SLURM_VER}/ && \
+    ./configure && make && make install
 
 # Configure OpenSSH
 # Also see: https://docs.docker.com/engine/examples/running_ssh_service/
@@ -47,16 +49,6 @@ RUN echo 'ddhpc:ddhpc' | chpasswd
 # SSH login fix. Otherwise user is kicked off after login
 RUN sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' -i /etc/pam.d/sshd
 ADD etc/supervisord.d/sshd.conf /etc/supervisor/conf.d/sshd.conf
-
-
-# Configure GlusterFS
-# RUN add-apt-repository ppa:gluster/glusterfs-3.8 && \
-#     apt-get update -y && \
-#     apt-get install -y glusterfs-server
-#
-# RUN mkdir -p /data/ddhpc
-# ADD etc/supervisord.d/glusterd.conf /etc/supervisor/conf.d/glusterd.conf
-
 
 # Configure munge (for SLURM authentication)
 ADD etc/munge/munge.key /etc/munge/munge.key
