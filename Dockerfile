@@ -1,5 +1,5 @@
 FROM ubuntu:17.04
-MAINTAINER jmcarbo <jmcarbo@gmail.com>
+MAINTAINER IMIM SRI <sri@imim.cat>
 
 ENV SLURM_VER=16.05.11
 
