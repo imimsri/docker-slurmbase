@@ -1,2 +1,2 @@
 build:
-	docker build -t jmcarbo/docker-slurmbase:latest .
+	docker build -t imimsri/docker-slurmbase:v16.04 .

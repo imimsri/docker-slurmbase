@@ -1,4 +1,4 @@
-FROM ubuntu:17.04
+FROM ubuntu:16.04
 MAINTAINER IMIM SRI <sri@imim.cat>
 
 ENV SLURM_VER=16.05.11
